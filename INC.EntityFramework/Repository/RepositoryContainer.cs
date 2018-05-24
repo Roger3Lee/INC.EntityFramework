@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
 
-namespace INC.EntityFramework.Repository
+namespace INC.EntityFramework
 {
     public class RepositoryContainer : IRepositoryContainer, IDisposable
     {
-        private readonly DbContext _context;
+        public readonly DbContext _context;
 
         public RepositoryContainer(DbContext context)
         {

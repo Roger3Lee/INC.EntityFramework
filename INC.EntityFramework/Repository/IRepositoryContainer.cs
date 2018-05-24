@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INC.EntityFramework.Repository
+namespace INC.EntityFramework
 {
     public interface IRepositoryContainer: IDisposable
     {

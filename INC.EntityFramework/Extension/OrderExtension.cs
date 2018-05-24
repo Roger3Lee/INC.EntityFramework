@@ -19,13 +19,13 @@ namespace INC.EntityFramework
             if ((index = propertyName.IndexOf("desc", StringComparison.InvariantCultureIgnoreCase)) >= 0)
             {
                 orderType = "OrderByDescending";
-                orderPropertyName = propertyName.Substring(0, index + 1);
+                orderPropertyName = propertyName.Substring(0, index).Trim();
             }
 
             var entityType = typeof(TSource);
 
             //Create x=>x.PropName
-            var propertyInfo = entityType.GetProperty(propertyName);
+            var propertyInfo = entityType.GetProperty(orderPropertyName);
             ParameterExpression arg = Expression.Parameter(entityType, "x");
             MemberExpression property = Expression.Property(arg, orderPropertyName);
             var selector = Expression.Lambda(property, new ParameterExpression[] { arg });
