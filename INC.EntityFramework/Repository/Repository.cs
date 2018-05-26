@@ -27,6 +27,15 @@ namespace INC.EntityFramework
             this._context.Set<T>().AddRange(entities);
         }
 
+        public void AddRange(params T[] entities)
+        {
+            var set = this._context.Set<T>();
+            foreach (var entity in entities)
+            {
+                set.Add(entity);
+            }
+        }
+
         public IList<T> All()
         {
             return this._context.Set<T>().ToList();
@@ -75,12 +84,29 @@ namespace INC.EntityFramework
             this._context.Set<T>().RemoveRange(entities);
         }
 
+        public void RemoveRange(params T[] entities)
+        {
+            var set = this._context.Set<T>();
+            foreach (var entity in entities)
+            {
+                set.Remove(entity);
+            }
+        }
+
         public void Update(T entity)
         {
             this._context.Entry<T>(entity).State = EntityState.Modified;
         }
 
         public void UpdateRange(IEnumerable<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                Update(entity);
+            }
+        }
+
+        public void UpdateRange(params T[] entities)
         {
             foreach (var entity in entities)
             {

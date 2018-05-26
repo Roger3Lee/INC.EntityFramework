@@ -27,12 +27,18 @@ namespace INC.EntityFramework
 
         void AddRange(IEnumerable<T> entities);
 
+        void AddRange(params T[]  entities);
+
         void Remove(T entity);
 
         void RemoveRange(IEnumerable<T> entities);
 
+        void RemoveRange(params T[] entities);
+
         void Update(T entity);
 
         void UpdateRange(IEnumerable<T> entities);
+
+        void UpdateRange(params T[] entities);
     }
 }                  
