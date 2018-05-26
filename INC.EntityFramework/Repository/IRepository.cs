@@ -11,11 +11,17 @@ namespace INC.EntityFramework
     {
         T Get(Expression<Func<T, bool>> perdicate);
 
-        List<T> All();
+        IList<T> All();
 
-        List<T> All(Expression<Func<T, bool>> perdicate);
+        IList<T> All(Expression<Func<T, bool>> perdicate);
 
-        List<T> All(Expression<Func<T, bool>> perdicate, string sort, int skip , int take);
+        IList<T> All(Expression<Func<T, bool>> perdicate, string sort, int skip , int take);
+
+        IList<T> AllAsNoTracking();
+
+        IList<T> AllAsNoTracking(Expression<Func<T, bool>> perdicate);
+
+        IList<T> AllAsNoTracking(Expression<Func<T, bool>> perdicate, string sort, int skip, int take);
 
         void Add(T entity);
 

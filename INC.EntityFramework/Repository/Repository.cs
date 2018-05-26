@@ -27,19 +27,37 @@ namespace INC.EntityFramework
             this._context.Set<T>().AddRange(entities);
         }
 
-        public List<T> All()
+        public IList<T> All()
         {
             return this._context.Set<T>().ToList();
         }
 
-        public List<T> All(Expression<Func<T, bool>> perdicate)
+
+        public IList<T> All(Expression<Func<T, bool>> perdicate)
         {
             return this._context.Set<T>().Where(perdicate).ToList();
         }
 
-        public List<T> All(Expression<Func<T, bool>> perdicate, string sort, int skip, int take)
+       
+
+        public IList<T> All(Expression<Func<T, bool>> perdicate, string sort, int skip, int take)
         {
             return this._context.Set<T>().Where(perdicate).OrderBy(sort).Skip(skip).Take(take).ToList();
+        }
+
+        public IList<T> AllAsNoTracking()
+        {
+            return this._context.Set<T>().AsNoTracking().ToList();
+        }
+
+        public IList<T> AllAsNoTracking(Expression<Func<T, bool>> perdicate)
+        {
+            return this._context.Set<T>().Where(perdicate).AsNoTracking().ToList();
+        }
+
+        public IList<T> AllAsNoTracking(Expression<Func<T, bool>> perdicate, string sort, int skip, int take)
+        {
+            return this._context.Set<T>().Where(perdicate).OrderBy(sort).Skip(skip).Take(take).AsNoTracking().ToList();
         }
 
         public T Get(Expression<Func<T, bool>> perdicate)
