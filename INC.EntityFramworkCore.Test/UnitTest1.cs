@@ -1,18 +1,21 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
-namespace INC.EntityFramework.Test
+namespace INC.EntityFrameworkCore.Test
 {
     [TestClass]
     public class UnitTest1
     {
-        private TestContext _context;
+        private TContext _context;
 
         [TestInitialize]
         public void Initializer()
         {
-            _context = new TestContext();
+            var optionsBuilder = new DbContextOptionsBuilder<TContext>();
+            optionsBuilder.UseSqlite("Data Source=blog.db");
+            _context = new TContext(optionsBuilder.Options);
         }
 
         [TestMethod]
@@ -46,11 +49,8 @@ namespace INC.EntityFramework.Test
             using (var uow = new UnitOfWork(_context))
             {
                 var resp = uow.Repositories<Student>();
-                var list1 = resp.All();
-
-                resp.RemoveRange(list1);
-                uow.SaveChanges();
-
+                var list1 = resp.Include(x=>x.Teacher).All();
+                
                 Assert.AreEqual(list1.Count(), 1);
             }
         }

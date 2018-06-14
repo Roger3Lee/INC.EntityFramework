@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Collections.Concurrent;
 
-namespace INC.EntityFramework
+namespace INC.EntityFrameworkCore
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public class Repository<T> : IRepository<T> where T: class 
     {
+        [ThreadStatic]
+        private ConcurrentQueue<object> _includeExpression = new ConcurrentQueue<object>();
+
         private readonly DbContext _context;
 
         public Repository(DbContext context)
@@ -35,23 +40,19 @@ namespace INC.EntityFramework
                 set.Add(entity);
             }
         }
-
         public IQueryable<T> All()
         {
-            return this._context.Set<T>();
+            return BuildInclude();
         }
-
 
         public IQueryable<T> All(Expression<Func<T, bool>> perdicate)
         {
-            return this._context.Set<T>().Where(perdicate);
+            return BuildInclude().Where(perdicate);
         }
-
-       
 
         public IQueryable<T> All(Expression<Func<T, bool>> perdicate, string sort, int skip, int take)
         {
-            return this._context.Set<T>().Where(perdicate).OrderBy(sort).Skip(skip).Take(take);
+            return BuildInclude().Where(perdicate).SortBy(sort).Skip(skip).Take(take);
         }
 
         public IQueryable<T> AllAsNoTracking()
@@ -68,10 +69,9 @@ namespace INC.EntityFramework
         {
             return this.All(perdicate, sort, skip, take).AsNoTracking();
         }
-
         public int Count()
         {
-            return this._context.Set<T>().Count();
+            return BuildInclude().Count();
         }
 
         public int Count(Expression<Func<T, bool>> perdicate)
@@ -81,7 +81,19 @@ namespace INC.EntityFramework
 
         public T Get(Expression<Func<T, bool>> perdicate)
         {
-            return this._context.Set<T>().FirstOrDefault(perdicate);
+            return this.BuildInclude().FirstOrDefault(perdicate);
+        }
+
+        public Repository<T> Include<TProperty>(Expression<Func<T, TProperty>> navigationPropertyPath)
+        {
+            this._includeExpression.Enqueue(navigationPropertyPath);
+            return this;
+        }
+
+        public Repository<T> Include(string navigationPropertyPath)
+        {
+            this._includeExpression.Enqueue(navigationPropertyPath);
+            return this;
         }
 
         public void Remove(T entity)
@@ -122,6 +134,45 @@ namespace INC.EntityFramework
             {
                 Update(entity);
             }
+        }
+
+        private IQueryable<T> BuildInclude()
+        {
+            IQueryable<T> query = this._context.Set<T>();
+            if (this._includeExpression.Count > 0)
+            {
+                object includeExpression = null;
+                while (this._includeExpression.TryDequeue(out includeExpression))
+                {
+                    var includeExpType = includeExpression.GetType();
+                    var include = string.Empty;
+                    if (includeExpType != typeof(string))
+                        include = GetFieldNameByLambda(includeExpression as Expression);
+
+                    query = query.Include(include);
+                }
+            }
+            return query;
+        }
+        private string GetFieldNameByLambda(Expression exprBody)
+        {
+            var property = "";
+            if (exprBody is LambdaExpression)
+            {
+                property = ((MemberExpression)((LambdaExpression)exprBody).Body).Member.Name;
+            }else if (exprBody is UnaryExpression)
+            {
+                property = ((MemberExpression)((UnaryExpression)exprBody).Operand).Member.Name;
+            }
+            else if (exprBody is MemberExpression)
+            {
+                property = ((MemberExpression)exprBody).Member.Name;
+            }
+            else if (exprBody is ParameterExpression)
+            {
+                property = ((ParameterExpression)exprBody).Type.Name;
+            }
+            return property;
         }
     }
 }

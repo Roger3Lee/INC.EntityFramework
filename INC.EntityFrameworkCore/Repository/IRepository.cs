@@ -1,14 +1,17 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INC.EntityFramework
+namespace INC.EntityFrameworkCore
 {
-    public interface IRepository <T>  where T : class
+    public interface IRepository<T> where T : class
     {
+
         T Get(Expression<Func<T, bool>> perdicate);
 
         int Count();
@@ -19,7 +22,7 @@ namespace INC.EntityFramework
 
         IQueryable<T> All(Expression<Func<T, bool>> perdicate);
 
-        IQueryable<T> All(Expression<Func<T, bool>> perdicate, string sort, int skip , int take);
+        IQueryable<T> All(Expression<Func<T, bool>> perdicate, string sort, int skip, int take);
 
         IQueryable<T> AllAsNoTracking();
 
@@ -31,7 +34,7 @@ namespace INC.EntityFramework
 
         void AddRange(IEnumerable<T> entities);
 
-        void AddRange(params T[]  entities);
+        void AddRange(params T[] entities);
 
         void Remove(T entity);
 
@@ -44,5 +47,9 @@ namespace INC.EntityFramework
         void UpdateRange(IEnumerable<T> entities);
 
         void UpdateRange(params T[] entities);
+
+        Repository<T> Include<TProperty>(Expression<Func<T, TProperty>> navigationPropertyPath);
+
+        Repository<T> Include(string navigationPropertyPath);
     }
-}                  
+}

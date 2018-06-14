@@ -1,20 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
-namespace INC.EntityFramework.Test
+namespace INC.EntityFrameworkCore.Test
 {
-    public class TestContext : DbContext
+    public class TContext : DbContext
     {
-        public TestContext():base("mssqllocaldb.db")
+        public TContext():base()
         {
         }
-
+        public TContext(DbContextOptions<TContext> options)
+        : base(options)
+        { }
         public DbSet<Student> Student { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlite("Data Source=blog.db", x => x.MigrationsAssembly("INC.EntityFramworkCore.Test"));
+            base.OnConfiguring(optionsBuilder);
+        }
     }
 
     public class Student
