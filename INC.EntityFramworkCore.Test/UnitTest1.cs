@@ -25,16 +25,7 @@ namespace INC.EntityFrameworkCore.Test
             {
                 var resp = uow.Repositories<Student>();
                 var list = resp.All(x=>1==1, "FirstName desc",0,10);
-
-                resp.AddRange(new Student()
-                {
-                    FirstName = "a",
-                    LastName = "b"
-                }, new Student()
-                {
-                    FirstName = "c",
-                    LastName = "d"
-                });
+                
 
                 uow.SaveChanges();
 
@@ -44,7 +35,7 @@ namespace INC.EntityFrameworkCore.Test
         }
 
         [TestMethod]
-        public void TestRemove()
+        public void TestInclude()
         {
             using (var uow = new UnitOfWork(_context))
             {
@@ -53,6 +44,37 @@ namespace INC.EntityFrameworkCore.Test
                 
                 Assert.AreEqual(list1.Count(), 1);
             }
+        }
+
+        [TestMethod]
+        public void TestMutiThreadInclude()
+        {
+            var task1 = new System.Threading.Tasks.Task(() =>
+            {
+                System.Threading.Thread.Sleep(10000);
+                using (var uow = new UnitOfWork(new TContext()))
+                {
+                    var resp = uow.Repositories<Student>();
+                    var list1 = resp.Include(x => x.Teacher).All();
+                }
+            });
+
+           var task2= new System.Threading.Tasks.Task(() =>
+            {
+                using (var uow = new UnitOfWork(new TContext()))
+                {
+                    var resp = uow.Repositories<Student>();
+                    resp.Include(x => x.Teacher) ;
+
+
+                    System.Threading.Thread.Sleep(100000);
+                    resp.All();
+                }
+            });
+
+            task1.Start();
+            task2.Start();
+            System.Threading.Tasks.Task.WaitAll(task1, task2);
         }
     }
 }

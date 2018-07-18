@@ -31,6 +31,7 @@ namespace INC.EntityFrameworkCore
         public void Dispose()
         {
             this._repositoryContainer.Dispose();
+            _context.Dispose();
         }
 
         public IRepository<T> Repositories<T>() where T : class

@@ -42,36 +42,17 @@ namespace INC.EntityFrameworkCore
         }
         public IQueryable<T> All()
         {
-            return BuildInclude();
+            return BuildInclude().AsNoTracking();
         }
 
         public IQueryable<T> All(Expression<Func<T, bool>> perdicate)
         {
-            return BuildInclude().Where(perdicate);
+            return BuildInclude().Where(perdicate).AsNoTracking();
         }
 
         public IQueryable<T> All(Expression<Func<T, bool>> perdicate, string sort, int skip, int take)
         {
-            return BuildInclude().Where(perdicate).SortBy(sort).Skip(skip).Take(take);
-        }
-
-        public IQueryable<T> AllAsNoTracking()
-        {
-            return this.All().AsNoTracking();
-        }
-
-        public IQueryable<T> AllAsNoTracking(Expression<Func<T, bool>> perdicate)
-        {
-            return this.All(perdicate).AsNoTracking();
-        }
-
-        public IQueryable<T> AllAsNoTracking(Expression<Func<T, bool>> perdicate, string sort, int skip, int take)
-        {
-            return this.All(perdicate, sort, skip, take).AsNoTracking();
-        }
-        public int Count()
-        {
-            return BuildInclude().Count();
+            return BuildInclude().Where(perdicate).SortBy(sort).Skip(skip).Take(take).AsNoTracking();
         }
 
         public int Count(Expression<Func<T, bool>> perdicate)
@@ -79,9 +60,14 @@ namespace INC.EntityFrameworkCore
             return this._context.Set<T>().Where(perdicate).Count();
         }
 
+        public int Count()
+        {
+            return this._context.Set<T>().Count();
+        }
+
         public T Get(Expression<Func<T, bool>> perdicate)
         {
-            return this.BuildInclude().FirstOrDefault(perdicate);
+            return this.BuildInclude().AsNoTracking().FirstOrDefault(perdicate);
         }
 
         public Repository<T> Include<TProperty>(Expression<Func<T, TProperty>> navigationPropertyPath)

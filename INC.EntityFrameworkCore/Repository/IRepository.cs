@@ -24,12 +24,6 @@ namespace INC.EntityFrameworkCore
 
         IQueryable<T> All(Expression<Func<T, bool>> perdicate, string sort, int skip, int take);
 
-        IQueryable<T> AllAsNoTracking();
-
-        IQueryable<T> AllAsNoTracking(Expression<Func<T, bool>> perdicate);
-
-        IQueryable<T> AllAsNoTracking(Expression<Func<T, bool>> perdicate, string sort, int skip, int take);
-
         void Add(T entity);
 
         void AddRange(IEnumerable<T> entities);
